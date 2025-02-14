@@ -2,9 +2,11 @@ from flask import Flask, jsonify
 import mysql.connector
 from db_connector import get_db_connection, close_connection
 from login.login import login_blueprint  
+from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 
 # Register blueprints
 app.register_blueprint(login_blueprint, url_prefix='/login')

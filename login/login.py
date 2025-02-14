@@ -11,15 +11,15 @@ def login():
     try:
         
         data = request.get_json()
-        username = data.get('username') 
+        user_name = data.get('user_name') 
         password = data.get('password')
-        if username is None or password is None:
-            return jsonify({'error': 'Username and password are required'}), 400
+        if user_name is None or password is None:
+            return jsonify({'error': 'user_name and password are required'}), 400
 
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         query = "SELECT * FROM login_data WHERE user_name = %s AND password = %s"
-        cursor.execute(query, (username, password))
+        cursor.execute(query, (user_name, password))
         user = cursor.fetchone()
 
         close_connection(connection)
@@ -27,7 +27,7 @@ def login():
         if user:
             return jsonify({"message": "Login successful", "user": user}), 200
         else:
-            return jsonify({"error": "Invalid username or password"}), 401
+            return jsonify({"error": "Invalid user_name or password"}), 401
 
     except mysql.connector.Error as e:
         return jsonify({"error": f"Database error: {e}"}), 500
