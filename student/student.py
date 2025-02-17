@@ -29,20 +29,26 @@ def search_student():
     try:           
         data = request.get_json()
         input_name = data.get('name', '').strip().lower()
+        year= data.get('year')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True) 
 
-        if not input_name:
-            cursor.execute("SELECT * FROM student;")
-            students = cursor.fetchall()
-        else:    
+        query = "SELECT * FROM student WHERE 1=1"  # Ensures proper query building
+        params = []
 
-            #initially I put input_name but it would literally search input_name 
-            query="SELECT * FROM student WHERE LOWER(name) LIKE %s;"
-            cursor.execute(query, (f"%{input_name}%",))
-            students = cursor.fetchall()
+        # Add name filtering if provided
+        if input_name:
+            query += " AND LOWER(name) LIKE %s"
+            params.append(f"%{input_name}%")
 
+        # Add year filtering if provided
+        if year:
+            query += " AND year = %s"
+            params.append(year)
+
+        cursor.execute(query, params)  # Execute with parameters to prevent SQL injection
+        students = cursor.fetchall()
         cursor.close()
         conn.close()
 
