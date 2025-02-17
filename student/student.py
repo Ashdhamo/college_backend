@@ -44,8 +44,13 @@ def search_student():
 
         # Add year filtering if provided
         if year:
-            query += " AND year = %s"
-            params.append(year)
+            if isinstance(year, list):  # If multiple years are provided
+                placeholders = ','.join(['%s'] * len(year))  # Creates "%s,%s" for query
+                query += f" AND year IN ({placeholders})"
+                params.extend(year)
+            else:  # If a single year is provided
+                query += " AND year = %s"
+                params.append(year)
 
         cursor.execute(query, params)  # Execute with parameters to prevent SQL injection
         students = cursor.fetchall()
