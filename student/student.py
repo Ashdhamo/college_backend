@@ -30,6 +30,7 @@ def search_student():
         data = request.get_json()
         input_name = data.get('name', '').strip().lower()
         year= data.get('year')
+        major= data.get('major')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True) 
@@ -41,6 +42,10 @@ def search_student():
         if input_name:
             query += " AND LOWER(name) LIKE %s"
             params.append(f"%{input_name}%")
+
+        if major:
+            query += " AND LOWER(major) LIKE %s"
+            params.append(f"%{major}%")
 
         # Add year filtering if provided
         if year:
