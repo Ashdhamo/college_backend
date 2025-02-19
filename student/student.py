@@ -66,3 +66,42 @@ def search_student():
 
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+
+@student_blueprint.route('/add', methods=['POST'])
+def add_student():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        data = request.get_json()
+
+        name = data.get('name')
+        year = data.get('year')
+        major = data.get('major')
+        email = data.get('email')
+               
+        if not all([name, year, major, email]):
+            return jsonify({'error': 'Missing required fields: name, year, major, or email'}), 400
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM student WHERE email = %s", (email,))
+        existing_student = cursor.fetchone()
+        if existing_student:
+            return jsonify({'error': 'Email already exists in Students table'}), 409
+        cursor.execute("INSERT INTO student (name, year, major, email) VALUES (%s, %s, %s, %s)", (name, year, major, email))
+        cursor.execute("SELECT ID FROM student WHERE name = %s AND year = %s AND major = %s AND email = %s", (name, year, major, email))
+        studentId = cursor.fetchone()
+        username = "student" + str(studentId[0])
+        cursor.execute("INSERT INTO login_data (id, email,position, user_name) VALUES (%s, %s, %s, %s)", (studentId[0], email, "student", username ))
+
+        conn.commit()
+
+        return jsonify({
+            'message': 'Student added successfully'
+        }), 201
+
+    except Exception as e: 
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+
+        #add name, email, year, major (no need to validate)
