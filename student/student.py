@@ -72,14 +72,13 @@ def add_student():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
+
         data = request.get_json()
 
         name = data.get('name')
         year = data.get('year')
         major = data.get('major')
         email = data.get('email')
-        conn = get_db_connection()
                
         if not all([name, year, major, email]):
             return jsonify({'error': 'Missing required fields: name, year, major, or email'}), 400
@@ -90,6 +89,11 @@ def add_student():
         if existing_student:
             return jsonify({'error': 'Email already exists in Students table'}), 409
         cursor.execute("INSERT INTO student (name, year, major, email) VALUES (%s, %s, %s, %s)", (name, year, major, email))
+        cursor.execute("SELECT ID FROM student WHERE name = %s AND year = %s AND major = %s AND email = %s", (name, year, major, email))
+        studentId = cursor.fetchone()
+        username = "student" + str(studentId[0])
+        cursor.execute("INSERT INTO login_data (id, email,position, user_name) VALUES (%s, %s, %s, %s)", (studentId[0], email, "student", username ))
+
         conn.commit()
 
         return jsonify({
