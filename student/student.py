@@ -105,3 +105,32 @@ def add_student():
         return jsonify({'error': str(e)}), 500
 
         #add name, email, year, major (no need to validate)
+
+
+@student_blueprint.route('/<id>', methods=['DELETE'])
+def delete_student(id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM student WHERE id = %s", (id,))
+        student = cursor.fetchone()
+        if not student:
+            cursor.close()
+            connection.close()
+            return jsonify({'error': 'Student not found'}), 404
+
+        
+        # Delete the student from the database
+        cursor.execute("DELETE FROM student WHERE id = %s", (id,))
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        return jsonify({'message': f'Student with ID {id} deleted successfully'}), 200
+
+    except Exception as e:
+        connection.rollback()
+        return jsonify({'error': str(e)}), 500
+
