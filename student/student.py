@@ -124,6 +124,8 @@ def delete_student(id):
         # Delete the student from the database
         cursor.execute("DELETE FROM student WHERE id = %s", (id,))
         connection.commit()
+        cursor.execute("DELETE FROM login_data WHERE id = %s AND position = %s ", (id, "student"))
+        connection.commit()
 
         cursor.close()
         connection.close()
@@ -134,3 +136,50 @@ def delete_student(id):
         connection.rollback()
         return jsonify({'error': str(e)}), 500
 
+@student_blueprint.route('/<int:id>', methods=['PATCH'])
+def update_student(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        data = request.get_json()
+
+        # Fields that can be updated
+        fields = ['name', 'year', 'major', 'email']
+        updates = []
+        values = []
+
+        for field in fields:
+            if field in data:
+                updates.append(f"{field} = %s")
+                values.append(data[field])
+
+        if not updates:
+            return jsonify({'error': 'No valid fields provided for update'}), 400
+
+        # Check if email is being updated and already exists
+        if 'email' in data:
+            cursor.execute("SELECT * FROM student WHERE email = %s AND ID != %s", (data['email'], id))
+            existing_student = cursor.fetchone()
+            if existing_student:
+                return jsonify({'error': 'Email already exists'}), 409
+
+        # Construct the update query
+        update_query = f"UPDATE student SET {', '.join(updates)} WHERE ID = %s"
+        cursor.execute(update_query, values + [id])
+
+        # Update email in login_data if email is changed
+        if 'email' in data:
+            cursor.execute("UPDATE login_data SET email = %s WHERE id = %s", (data['email'], id))
+
+        conn.commit()
+
+        return jsonify({'message': 'Student updated successfully'}), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
