@@ -24,48 +24,47 @@ def get_professor():
         return jsonify({"error": str(err)}), 500
 
 
-# @professor_blueprint.route('/search', methods=['POST'])
-# def search_professor():
-#     try:           
-#         data = request.get_json()
-#         input_name = data.get('name', '').strip().lower()
-#         year= data.get('year')
-#         major= data.get('major')
+@professor_blueprint.route('/search', methods=['POST'])
+def search_professor():
+    try:           
+        data = request.get_json()
+        input_name = data.get('name', '').strip().lower()
+        #year= data.get('year')
+       # major= data.get('major')
 
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True) 
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True) 
 
-#         query = "SELECT * FROM professor WHERE 1=1"  # Ensures proper query building
-#         params = []
+        query = "SELECT * FROM professor WHERE 1=1"  # Ensures proper query building
+        params = []
 
-#         # Add name filtering if provided
-#         if input_name:
-#             query += " AND LOWER(name) LIKE %s"
-#             params.append(f"%{input_name}%")
+        if input_name:
+            query += " AND LOWER(name) LIKE %s"
+            params.append(f"%{input_name}%")
 
-#         if major:
-#             query += " AND LOWER(major) LIKE %s"
-#             params.append(f"%{major}%")
+        # if major:
+        #     query += " AND LOWER(major) LIKE %s"
+        #     params.append(f"%{major}%")
 
-#         # Add year filtering if provided
-#         if year:
-#             if isinstance(year, list):  # If multiple years are provided
-#                 placeholders = ','.join(['%s'] * len(year))  # Creates "%s,%s" for query
-#                 query += f" AND year IN ({placeholders})"
-#                 params.extend(year)
-#             else:  # If a single year is provided
-#                 query += " AND year = %s"
-#                 params.append(year)
+        # # Add year filtering if provided
+        # if year:
+        #     if isinstance(year, list):  # If multiple years are provided
+        #         placeholders = ','.join(['%s'] * len(year))  # Creates "%s,%s" for query
+        #         query += f" AND year IN ({placeholders})"
+        #         params.extend(year)
+        #     else:  # If a single year is provided
+        #         query += " AND year = %s"
+        #         params.append(year)
 
-#         cursor.execute(query, params)  # Execute with parameters to prevent SQL injection
-#         professors = cursor.fetchall()
-#         cursor.close()
-#         conn.close()
+        cursor.execute(query, params)  # Execute with parameters to prevent SQL injection
+        professors = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-#         return jsonify(professors), 200
+        return jsonify(professors), 200
 
-#     except mysql.connector.Error as err:
-#         return jsonify({"error": str(err)}), 500
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
 
 # @professor_blueprint.route('/add', methods=['POST'])
 # def add_professor():
