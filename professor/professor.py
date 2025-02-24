@@ -30,7 +30,7 @@ def search_professor():
         data = request.get_json()
         input_name = data.get('name', '').strip().lower()
         #year= data.get('year')
-       # major= data.get('major')
+        tenure= data.get('tenure')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True) 
@@ -46,15 +46,13 @@ def search_professor():
         #     query += " AND LOWER(major) LIKE %s"
         #     params.append(f"%{major}%")
 
-        # # Add year filtering if provided
-        # if year:
-        #     if isinstance(year, list):  # If multiple years are provided
-        #         placeholders = ','.join(['%s'] * len(year))  # Creates "%s,%s" for query
-        #         query += f" AND year IN ({placeholders})"
-        #         params.extend(year)
-        #     else:  # If a single year is provided
-        #         query += " AND year = %s"
-        #         params.append(year)
+       
+        if tenure in (0, 1):
+            query += " AND tenure = %s"
+            params.append(tenure)
+
+
+
 
         cursor.execute(query, params)  # Execute with parameters to prevent SQL injection
         professors = cursor.fetchall()
