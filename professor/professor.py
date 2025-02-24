@@ -31,6 +31,8 @@ def search_professor():
         input_name = data.get('name', '').strip().lower()
         #year= data.get('year')
         tenure= data.get('tenure')
+        salary= data.get('salary')
+        salaryValue= data.get('salaryValue')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True) 
@@ -50,6 +52,13 @@ def search_professor():
         if tenure in (0, 1):
             query += " AND tenure = %s"
             params.append(tenure)
+        
+        if salary == "greater":
+            query += " AND salary > %s"
+            params.append(salaryValue)
+        elif salary == "less":
+            query += " AND salary < %s"
+            params.append(salaryValue)
 
 
 
