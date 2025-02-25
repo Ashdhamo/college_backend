@@ -29,7 +29,7 @@ def search_professor():
     try:           
         data = request.get_json()
         input_name = data.get('name', '').strip().lower()
-        #year= data.get('year')
+        department= data.get('department')
         tenure= data.get('tenure')
         salary= data.get('salary')
         salaryValue= data.get('salaryValue')
@@ -44,9 +44,9 @@ def search_professor():
             query += " AND LOWER(name) LIKE %s"
             params.append(f"%{input_name}%")
 
-        # if major:
-        #     query += " AND LOWER(major) LIKE %s"
-        #     params.append(f"%{major}%")
+        if department:
+            query += " AND LOWER(department) LIKE %s"
+            params.append(f"%{department}%")
 
        
         if tenure in (0, 1):
