@@ -160,3 +160,22 @@ def update_professor(ID):
     finally:
         cursor.close()
         conn.close()
+
+@professor_blueprint.route('/<int:id>', methods=['DELETE'])
+def delete_professor(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("DELETE FROM professor WHERE id= %s", (id,))
+        cursor.execute("DELETE FROM login_data WHERE id= %s AND position =%s", (id, "professor"))
+        conn.commit()
+
+        return jsonify({'message': 'Professor deleted successfully'}), 200
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+    
