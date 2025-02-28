@@ -4,6 +4,7 @@ from db_connector import get_db_connection, close_connection
 from login.login import login_blueprint  
 from student.student import student_blueprint
 from professor.professor import professor_blueprint
+from classes.classes import classes_blueprint
 from flask_cors import CORS
 
 # Initialize Flask app
@@ -14,6 +15,7 @@ CORS(app)
 app.register_blueprint(login_blueprint, url_prefix='/login')
 app.register_blueprint(student_blueprint, url_prefix='/student')
 app.register_blueprint(professor_blueprint, url_prefix='/professor')
+app.register_blueprint(classes_blueprint, url_prefix='/classes')
 
 
 
